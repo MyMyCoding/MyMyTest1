@@ -6,5 +6,14 @@ def show_structure(pdb_data):
     view.addModel(pdb_data, "pdb")
     view.setStyle({"cartoon": {"color": "spectrum"}})
     view.zoomTo()
-    html = view.get_html()
+    html = f"""
+    <html>
+    <head>
+    <script src="https://3Dmol.org/build/3Dmol.js"></script>
+    </head>
+    <body>
+    {view._make_html()}
+    </body>
+    </html>
+    """
     components.html(html, height=400)
