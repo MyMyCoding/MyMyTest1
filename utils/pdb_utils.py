@@ -1,6 +1,7 @@
 from Bio.PDB import PDBParser, Superimposer
 from io import StringIO
 import requests
+import numpy as np
 
 def get_pdb_info(pdb_data):
     parser = PDBParser(QUIET=True)
@@ -23,8 +24,11 @@ def calculate_rmsd(pdb1, pdb2):
     s2 = parser.get_structure("alt", StringIO(pdb2))
     atoms1 = [atom for atom in s1.get_atoms() if atom.get_id() == "P"]
     atoms2 = [atom for atom in s2.get_atoms() if atom.get_id() == "P"]
+    n = min(len(atoms1), len(atoms2))
+    if n == 0:
+        return float("nan")
     si = Superimposer()
-    si.set_atoms(atoms1[:min(len(atoms1), len(atoms2))], atoms2[:min(len(atoms1), len(atoms2))])
+    si.set_atoms(atoms1[:n], atoms2[:n])
     return si.rms
 
 def fetch_plip_data(pdb_data):
@@ -40,3 +44,18 @@ def fetch_plip_data(pdb_data):
             return {"error": f"PLIP API returned status {response.status_code}"}
     except Exception as e:
         return {"error": str(e)}
+
+# Dummy interaction-based features (to be replaced with real PLIP parsing)
+def extract_interaction_features(pdb_data):
+    return {
+        "num_hbonds": np.random.randint(1, 10),
+        "num_hydrophobic": np.random.randint(0, 5),
+        "num_pistacking": np.random.randint(0, 3)
+    }
+
+# Dummy ML scoring (replace with trained model)
+def predict_affinity(features):
+    score = (features["num_hbonds"] * 2.0 +
+             features["num_hydrophobic"] * 1.5 +
+             features["num_pistacking"] * 3.0)
+    return score
